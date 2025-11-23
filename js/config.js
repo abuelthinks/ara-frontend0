@@ -4,13 +4,10 @@
  */
 
 const CONFIG = {
-  // Environment: 'development' or 'production'
-  ENV: 'development',
-  
-  // Django REST API Base URL
-  // LOCAL: http://localhost:8000
-  // PRODUCTION: https://your-domain.com
-  API_BASE_URL: 'http://localhost:8000/api',
+  ENV: window.location.hostname.includes('localhost') ? 'development' : 'production',
+  API_BASE_URL: window.location.hostname.includes('localhost')
+    ? 'http://localhost:8000/api'
+    : 'https://ara-test1-ca0b96725df3.herokuapp.com/api',
   
   // API Endpoints
   ENDPOINTS: {
