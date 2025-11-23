@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARA - Parent Input Form</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: #2186ad;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #2186ad;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #f5f5f5;
+        }
+
+        .sidebar a.active {
+            background: #2186ad;
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #2186ad;
+            padding-bottom: 10px;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .checkbox-group, .radio-group {
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item, .radio-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding-left: 0;
+        }
+
+        .checkbox-item input[type="checkbox"],
+        .radio-item input[type="radio"] {
+            margin-right: 10px;
+            margin-top: 3px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .checkbox-item label, .radio-item label {
+            display: inline;
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .nested-field {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        .nested-field input,
+        .nested-field textarea {
+            width: calc(100% - 30px);
+        }
+
+        .btn {
+            background: #2186ad;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #1a6fa0;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .submission-card {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2186ad;
+        }
+
+        .submission-card h4 {
+            margin: 0 0 10px 0;
+            color: #2186ad;
+        }
+
+        .submission-card p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body style="display: none;" id="app-body">
+    <div class="header">
+        <h1>ARA - Parent Portal</h1>
+        <div class="user-info">
+            <div>Welcome, <strong id="userName"></strong></div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <h3>Menu</h3>
+            <ul>
+                <li><a href="#" class="nav-link active" data-section="input">Parent Input Form</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Form Section -->
+            <div id="input-section" class="section active">
+                <h2>Parent Input Form</h2>
+                <div id="message-container"></div>
+
+                <form id="parentInputForm">
+                    <!-- SECTION A: Background Information -->
+                    <div class="form-section-title">Section A: Background Information</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="childFirstName">Child's Name (First):</label>
+                            <input type="text" id="childFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="childLastName">Child's Name (Last):</label>
+                            <input type="text" id="childLastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="childDOB">Date of Birth:</label>
+                            <input type="date" id="childDOB" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender:</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="genderMale" name="childGender" value="MALE">
+                                    <label for="genderMale">Male</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="genderFemale" name="childGender" value="FEMALE">
+                                    <label for="genderFemale">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="iepStartDate">IEP Start Date:</label>
+                            <input type="date" id="iepStartDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="childGrade">Grade/Level:</label>
+                            <input type="text" id="childGrade">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parentGuardianName">Parent/Guardian's Name:</label>
+                            <input type="text" id="parentGuardianName">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Information</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parentPhone">Phone:</label>
+                            <input type="text" id="parentPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="parentEmail">Email:</label>
+                            <input type="email" id="parentEmail">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="childLanguage">Primary Language:</label>
+                            <input type="text" id="childLanguage">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="medicalAlerts">Medical Alerts/Medications:</label>
+                            <textarea id="medicalAlerts" placeholder="Any medical alerts or current medications"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Eligibility Criteria</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eligAutism" value="Autism Spectrum Disorder" class="eligibility-cb">
+                                    <label for="eligAutism">Autism Spectrum Disorder</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eligSpeech" value="Speech/Language Impairment" class="eligibility-cb">
+                                    <label for="eligSpeech">Speech/Language Impairment</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eligADHD" value="ADHD/ADD" class="eligibility-cb">
+                                    <label for="eligADHD">ADHD/ADD</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eligLearning" value="Learning Disability" class="eligibility-cb">
+                                    <label for="eligLearning">Learning Disability</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eligDev" value="Developmental Delay" class="eligibility-cb">
+                                    <label for="eligDev">Developmental Delay</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eligOther" value="Other" class="eligibility-cb">
+                                    <label for="eligOther">Other</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION B: Developmental History and Assessment Summary -->
+                    <div class="form-section-title">Section B: Developmental History and Assessment Summary</div>
+
+                    <div class="form-group">
+                        <label style="font-weight: bold;">Developmental Milestones:</label>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="satUpAge">Sat up at age (months):</label>
+                            <input type="number" id="satUpAge" min="0" step="0.1" placeholder="e.g., 6">
+                        </div>
+                        <div class="form-group">
+                            <label for="crawledAge">Crawled at age (months):</label>
+                            <input type="number" id="crawledAge" min="0" step="0.1" placeholder="e.g., 8">
+                        </div>
+                        <div class="form-group">
+                            <label for="walkedAge">Walked at age (months):</label>
+                            <input type="number" id="walkedAge" min="0" step="0.1" placeholder="e.g., 12">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstWordsAge">First words at age (months):</label>
+                            <input type="number" id="firstWordsAge" min="0" step="0.1" placeholder="e.g., 12">
+                        </div>
+                        <div class="form-group">
+                            <label for="formedSentencesAge">Formed sentences at age (months):</label>
+                            <input type="number" id="formedSentencesAge" min="0" step="0.1" placeholder="e.g., 24">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-weight: bold;">Previous Schools/Services:</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="previousSchool">Previous school:</label>
+                        <input type="text" id="previousSchool">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Special education services received:</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="specEduYes" name="special_ed_received" value="true">
+                                    <label for="specEduYes">Yes</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="specEduNo" name="special_ed_received" value="false">
+                                    <label for="specEduNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Individualized Education Plan (IEP):</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="iepYes" name="has_iep" value="true">
+                                    <label for="iepYes">Yes</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="iepNo" name="has_iep" value="false">
+                                    <label for="iepNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otherServices">Other services (e.g., therapy):</label>
+                        <textarea id="otherServices"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-weight: bold;">Areas of Concern:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernComm" value="Communication" class="areas-concern-cb">
+                                <label for="concernComm">Communication</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernCog" value="Cognitive Development" class="areas-concern-cb">
+                                <label for="concernCog">Cognitive Development</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernMotor" value="Motor Skills" class="areas-concern-cb">
+                                <label for="concernMotor">Motor Skills</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernSocial" value="Social Interaction" class="areas-concern-cb">
+                                <label for="concernSocial">Social Interaction</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernBehavior" value="Behavioral Skills" class="areas-concern-cb">
+                                <label for="concernBehavior">Behavioral Skills</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernEmotional" value="Emotional Regulation" class="areas-concern-cb">
+                                <label for="concernEmotional">Emotional Regulation</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernSensory" value="Sensory Processing" class="areas-concern-cb">
+                                <label for="concernSensory">Sensory Processing</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concernAdaptive" value="Adaptive Skills" class="areas-concern-cb">
+                                <label for="concernAdaptive">Adaptive Skills</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION C: Parent/Guardian Input -->
+                    <div class="form-section-title">Section C: Parent/Guardian Input</div>
+
+                    <div class="form-group">
+                        <label for="primaryConcerns">Primary Concerns:</label>
+                        <textarea id="primaryConcerns" placeholder="What are your primary concerns about your child?" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goalsForChild">Goals for Your Child:</label>
+                        <textarea id="goalsForChild" placeholder="What are your goals for your child?" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="strategiesApproaches">Strategies/Approaches That Have Worked:</label>
+                        <textarea id="strategiesApproaches" placeholder="What strategies work well with your child?"></textarea>
+                    </div>
+
+                    <!-- SECTION D: Behavioral Information -->
+                    <div class="form-section-title">Section D: Behavioral Information</div>
+
+                    <div class="form-group">
+                        <label>My child has difficulty with:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diffTransitions" value="Transitions" class="behavioral-diff-cb">
+                                <label for="diffTransitions">Transitions</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diffFocusing" value="Focusing" class="behavioral-diff-cb">
+                                <label for="diffFocusing">Focusing</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diffPeer" value="Peer interactions" class="behavioral-diff-cb">
+                                <label for="diffPeer">Peer interactions</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="behaviorDescription">Can you describe your child's typical behavior at home and in social settings?</label>
+                        <textarea id="behaviorDescription"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frustratedAnxious">My child is often frustrated or anxious due to specific triggers:</label>
+                        <textarea id="frustratedAnxious"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="triggerExamples">Examples of triggers:</label>
+                        <textarea id="triggerExamples"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-weight: bold;">Calming strategies that work best include:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="calmDeepBreathing" value="Deep breathing" class="calming-cb">
+                                <label for="calmDeepBreathing">Deep breathing</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="calmSensory" value="Sensory tools (e.g., fidget toys)" class="calming-cb">
+                                <label for="calmSensory">Sensory tools (e.g., fidget toys)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="calmQuiet" value="Quiet time" class="calming-cb">
+                                <label for="calmQuiet">Quiet time</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="calmOther" value="Other" class="calming-cb">
+                                <label for="calmOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-weight: bold;">Communication and Social Skills:</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>My child primarily communicates through:</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="commVerbal" name="communication_method" value="Verbal communication">
+                                <label for="commVerbal">Verbal communication</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="commNonVerbal" name="communication_method" value="Non-verbal gestures">
+                                <label for="commNonVerbal">Non-verbal gestures</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="commOther" name="communication_method" value="Other methods">
+                                <label for="commOther">Other methods</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="peerAdultInteraction">How does your child interact with peers or adults?</label>
+                        <textarea id="peerAdultInteraction"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>My child feels more comfortable in:</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="envStructured" name="comfort_environment" value="Structured environments">
+                                <label for="envStructured">Structured environments</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="envUnstructured" name="comfort_environment" value="Unstructured environments">
+                                <label for="envUnstructured">Unstructured environments</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="envOther" name="comfort_environment" value="Other">
+                                <label for="envOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION E: Sensory and Physical Needs -->
+                    <div class="form-section-title">Section E: Sensory and Physical Needs</div>
+
+                    <div class="form-group">
+                        <label>My child has sensory sensitivities to:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="sensNoise" value="Noise" class="sensory-cb">
+                                <label for="sensNoise">Noise</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="sensLight" value="Light" class="sensory-cb">
+                                <label for="sensLight">Light</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="sensTextures" value="Textures" class="sensory-cb">
+                                <label for="sensTextures">Textures</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="sensOther" value="Other" class="sensory-cb">
+                                <label for="sensOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>My child requires physical accommodations:</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="physAccomYes" name="physical_accommodations" value="yes" onchange="document.getElementById('physAccomDetails').style.display='block'">
+                                <label for="physAccomYes">Yes (please specify):</label>
+                            </div>
+                        </div>
+                        <div class="nested-field" id="physAccomDetails" style="display: none;">
+                            <textarea id="physAccomDetailsText" placeholder="Describe physical accommodations needed"></textarea>
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="physAccomNo" name="physical_accommodations" value="no" onchange="document.getElementById('physAccomDetails').style.display='none'">
+                                <label for="physAccomNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION F: Goals and Expectations -->
+                    <div class="form-section-title">Section F: Goals and Expectations</div>
+
+                    <div class="form-group">
+                        <label>Goals for my child this year include:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goalAcademic" value="Academic improvement" class="goals-year-cb">
+                                <label for="goalAcademic">Academic improvement</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goalSocial" value="Social development" class="goals-year-cb">
+                                <label for="goalSocial">Social development</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goalEmotional" value="Emotional growth" class="goals-year-cb">
+                                <label for="goalEmotional">Emotional growth</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goalOther" value="Other" class="goals-year-cb">
+                                <label for="goalOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goals35Years">What specific goals or skills would you like your child to develop in the next 3-5 years?</label>
+                        <textarea id="goals35Years"></textarea>
+                    </div>
+
+                    <!-- SECTION G: Home Environment and Support -->
+                    <div class="form-section-title">Section G: Home Environment and Support</div>
+
+                    <div class="form-group">
+                        <label>Strategies or routines that work well at home include:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="routineClear" value="Clear schedules" class="home-routine-cb">
+                                <label for="routineClear">Clear schedules</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="routineReward" value="Reward systems" class="home-routine-cb">
+                                <label for="routineReward">Reward systems</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="routineVisual" value="Visual aids" class="home-routine-cb">
+                                <label for="routineVisual">Visual aids</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="routineOther" value="Other" class="home-routine-cb">
+                                <label for="routineOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalSupport">What additional support or resources would help you at home?</label>
+                        <textarea id="additionalSupport"></textarea>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="btn-group">
+                        <button type="submit" class="btn">Submit Form</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        if (!Auth.requireRole('PARENT')) {
+            throw new Error('Access denied - parent only');
+        }
+    </script>
+    <script>
+        console.log('[Init] Starting parent dashboard...');
+        
+        Auth.requireRole('PARENT');
+        document.getElementById('app-body').style.display = 'block';
+        
+        const user = Auth.getCurrentUser();
+        document.getElementById('userName').textContent = user.username || 'Parent';
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            Auth.logout();
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.dataset.section;
+                showSection(section);
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`${sectionName}-section`).classList.add('active');
+
+            if (sectionName === 'history') {
+                loadSubmissions();
+            }
+        }
+
+        function getCheckboxValues(selector) {
+            const values = [];
+            document.querySelectorAll(selector + ':checked').forEach(cb => {
+                if (cb.value) values.push(cb.value);
+            });
+            return values;
+        }
+
+        function getRadioValue(name) {
+            const radio = document.querySelector(`input[name="${name}"]:checked`);
+            return radio ? radio.value : '';
+        }
+
+        function resetForm() {
+            document.getElementById('parentInputForm').reset();
+            document.getElementById('physAccomDetails').style.display = 'none';
+        }
+
+        document.getElementById('parentInputForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageContainer = document.getElementById('message-container');
+            
+            const childFirstName = document.getElementById('childFirstName').value.trim();
+            const childLastName = document.getElementById('childLastName').value.trim();
+            const childDOB = document.getElementById('childDOB').value;
+            
+            if (!childFirstName || !childLastName) {
+                messageContainer.innerHTML = '<div class="error-message">✗ Child first and last name are required!</div>';
+                return;
+            }
+
+            const data = {
+                // Child info (required for child creation)
+                first_name: childFirstName,
+                last_name: childLastName,
+                date_of_birth: childDOB || null,
+                gender: getRadioValue('childGender'),
+                grade_level: document.getElementById('childGrade').value,
+                primary_language: document.getElementById('childLanguage').value,
+                
+                // Section A
+                iep_start_date: document.getElementById('iepStartDate').value || null,
+                parent_guardian_name: document.getElementById('parentGuardianName').value,
+                parent_phone: document.getElementById('parentPhone').value,
+                parent_email: document.getElementById('parentEmail').value,
+                medical_alerts: document.getElementById('medicalAlerts').value,
+                medications: document.getElementById('medicalAlerts').value,
+                eligibility_criteria: getCheckboxValues('.eligibility-cb'),
+                
+                // Section B
+                sat_up_age: document.getElementById('satUpAge').value ? parseFloat(document.getElementById('satUpAge').value) : null,
+                crawled_age: document.getElementById('crawledAge').value ? parseFloat(document.getElementById('crawledAge').value) : null,
+                walked_age: document.getElementById('walkedAge').value ? parseFloat(document.getElementById('walkedAge').value) : null,
+                first_words_age: document.getElementById('firstWordsAge').value ? parseFloat(document.getElementById('firstWordsAge').value) : null,
+                formed_sentences_age: document.getElementById('formedSentencesAge').value ? parseFloat(document.getElementById('formedSentencesAge').value) : null,
+                previous_school_name: document.getElementById('previousSchool').value,
+                special_education_services_received: getRadioValue('special_ed_received') === 'true',
+                has_prior_iep: getRadioValue('has_iep') === 'true',
+                other_prior_services: document.getElementById('otherServices').value,
+                areas_of_concern: getCheckboxValues('.areas-concern-cb'),
+                
+                // Section C
+                primary_concerns: document.getElementById('primaryConcerns').value,
+                goals_for_child: document.getElementById('goalsForChild').value,
+                strategies_approaches_that_work: document.getElementById('strategiesApproaches').value,
+                
+                // Section D
+                behavioral_difficulties: getCheckboxValues('.behavioral-diff-cb'),
+                behavior_description_home_social: document.getElementById('behaviorDescription').value,
+                behavior_frustration_triggers: document.getElementById('frustratedAnxious').value,
+                triggers_examples: document.getElementById('triggerExamples').value,
+                calming_strategies_work: getCheckboxValues('.calming-cb'),
+                primary_communication_method: getRadioValue('communication_method'),
+                peer_adult_interaction: document.getElementById('peerAdultInteraction').value,
+                comfort_environment: getRadioValue('comfort_environment'),
+                
+                // Section E
+                sensory_sensitivities: getCheckboxValues('.sensory-cb'),
+                physical_accommodations_required: getRadioValue('physical_accommodations') === 'yes',
+                physical_accommodations_details: document.getElementById('physAccomDetailsText').value,
+                
+                // Section F
+                goals_this_year: getCheckboxValues('.goals-year-cb'),
+                goals_3_5_years: document.getElementById('goals35Years').value,
+                
+                // Section G
+                strategies_routines_home: getCheckboxValues('.home-routine-cb'),
+                additional_support_resources_needed: document.getElementById('additionalSupport').value,
+            };
+
+            console.log('[Form] Submitting data:', data);
+
+            try {
+                const response = await API.post('/parent-inputs/', data);
+                console.log('[Form] Success response:', response);
+                
+                messageContainer.innerHTML = '<div class="success-message">✓ Parent input submitted successfully!</div>';
+                resetForm();
+
+                setTimeout(() => {
+                    messageContainer.innerHTML = '';
+                }, 5000);
+            } catch (error) {
+                console.error('[Form] ERROR:', error);
+                messageContainer.innerHTML = `<div class="error-message">✗ Error submitting: ${error.message}</div>`;
+            }
+        });
+
+        async function loadSubmissions() {
+            try {
+                const response = await API.get('/parent-inputs/');
+                const container = document.getElementById('submissionsContainer');
+
+                if (response && response.length > 0) {
+                    const html = response.map(submission => `
+                        <div class="submission-card">
+                            <h4>${submission.child_name || 'Child'}</h4>
+                            <p>Submitted: ${new Date(submission.submission_date).toLocaleDateString()}</p>
+                            <p><strong>Concerns:</strong> ${submission.primary_concerns?.substring(0, 100) || 'N/A'}...</p>
+                        </div>
+                    `).join('');
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="loading">No submissions yet.</div>';
+                }
+            } catch (error) {
+                document.getElementById('submissionsContainer').innerHTML = '<div class="loading">Error loading submissions</div>';
+            }
+        }
+    </script>
+</body>
+</html>

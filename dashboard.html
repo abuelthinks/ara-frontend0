@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARA Dashboard</title>
+    <style>
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: #2186ad;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            margin: 0 0 30px 0;
+            font-size: 18px;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .sidebar nav li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .sidebar nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .sidebar nav a.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+        .main-content {
+            background: #f5f5f5;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .top-bar {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .btn-logout {
+            background: #d9534f;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-logout:hover {
+            background: #c9302c;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #2186ad;
+        }
+    </style>
+</head>
+<body>
+    <!-- Require authentication -->
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        Auth.requireAuth();
+        // Redirect if not correct role - customize per page
+    </script>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2 id="sidebarTitle">Dashboard</h2>
+            <nav id="sidebarNav">
+                <ul>
+                    <li><a href="#home" data-section="home">Home</a></li>
+                    <li><a href="#children" data-section="children">Children</a></li>
+                    <li><a href="#reports" data-section="reports">Reports</a></li>
+                    <li><a href="#settings" data-section="settings">Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <button class="btn-logout" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <div id="content">
+                <!-- Content loaded here dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        // Display current user info
+        const user = Auth.getCurrentUser();
+        document.getElementById('userName').textContent = 
+            `${user.first_name} ${user.last_name}`;
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            Auth.logout();
+        });
+
+        // Navigation handler
+        document.querySelectorAll('[data-section]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.dataset.section;
+                loadSection(section);
+                
+                // Highlight active nav
+                document.querySelectorAll('[data-section]').forEach(a => 
+                    a.parentElement.classList.remove('active'));
+                e.target.parentElement.classList.add('active');
+            });
+        });
+
+        // Load initial section
+        async function loadSection(section) {
+            const content = document.getElementById('content');
+            
+            switch(section) {
+                case 'home':
+                    content.innerHTML = `
+                        <div class="card">
+                            <h3>Welcome, ${user.first_name}!</h3>
+                            <p>Select an option from the sidebar to get started.</p>
+                        </div>
+                    `;
+                    break;
+                case 'children':
+                    await loadChildren();
+                    break;
+                case 'reports':
+                    await loadReports();
+                    break;
+                case 'settings':
+                    await loadSettings();
+                    break;
+            }
+        }
+
+        async function loadChildren() {
+            const content = document.getElementById('content');
+            try {
+                const children = await API.get('/children/');
+                content.innerHTML = `
+                    <div class="card">
+                        <h3>Children</h3>
+                        ${children.length ? `
+                            <ul>
+                                ${children.map(child => `
+                                    <li>${child.name} - ${child.date_of_birth}</li>
+                                `).join('')}
+                            </ul>
+                        ` : '<p>No children found.</p>'}
+                    </div>
+                `;
+            } catch (error) {
+                content.innerHTML = `<div class="card"><p>Error loading children: ${error.message}</p></div>`;
+            }
+        }
+
+        async function loadReports() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="card">
+                    <h3>Reports</h3>
+                    <p>Reports module coming soon.</p>
+                </div>
+            `;
+        }
+
+        async function loadSettings() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="card">
+                    <h3>Settings</h3>
+                    <p>Settings module coming soon.</p>
+                </div>
+            `;
+        }
+
+        // Load home on init
+        loadSection('home');
+    </script>
+</body>
+</html>
