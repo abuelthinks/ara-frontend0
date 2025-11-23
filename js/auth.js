@@ -3,10 +3,12 @@
  * Uses custom login endpoint that returns access+refresh tokens and user data
  */
 
+
 const Auth = (() => {
   const ACCESS_KEY = 'ara_jwt_access';
   const REFRESH_KEY = 'ara_jwt_refresh';
   const USER_KEY = 'ara_current_user';
+
 
   return {
     /**
@@ -16,8 +18,10 @@ const Auth = (() => {
       try {
         console.log('[Auth] Attempting login with username:', username);
 
+
         const url = `${CONFIG.API_BASE_URL}/auth/login/`;
         console.log('[Auth] Login URL:', url);
+
 
         const response = await fetch(url, {
           method: 'POST',
@@ -25,13 +29,16 @@ const Auth = (() => {
           body: JSON.stringify({ username, password }),
         });
 
+
         console.log('[Auth] Response status:', response.status);
         const data = await response.json();
         console.log('[Auth] Response data:', data);
 
+
         if (!response.ok) {
           throw new Error(data.error || 'Login failed');
         }
+
 
         // Expect JWT: { access, refresh, user }
         if (!data.access || !data.refresh || !data.user) {
@@ -39,15 +46,24 @@ const Auth = (() => {
           throw new Error('Invalid login response from server');
         }
 
+
         // Store both tokens and user info
         localStorage.setItem(ACCESS_KEY, data.access);
         localStorage.setItem(REFRESH_KEY, data.refresh);
         localStorage.setItem(USER_KEY, JSON.stringify(data.user));
 
+
         console.log(`[Auth] Login successful: ${data.user.username} (${data.user.role})`);
+
+
+        // ✅ START AUTO-REFRESH TIMER HERE
+        TokenManager.startTokenRefreshTimer(data.refresh);
+        console.log('[Auth] Token refresh timer started');
+
 
         // Redirect user based on role
         Auth.redirectToDashboard(data.user.role);
+
 
         return data;
       } catch (error) {
@@ -55,6 +71,7 @@ const Auth = (() => {
         throw error;
       }
     },
+
 
     /**
      * Redirect user by role
@@ -67,16 +84,23 @@ const Auth = (() => {
         'ADMIN': 'pages/admin.html',
       };
 
+
       const redirectUrl = redirectMap[role] || 'pages/parent.html';
       console.log(`[Auth] Redirecting ${role} to ${redirectUrl}`);
       window.location.href = redirectUrl;
     },
+
 
     /**
      * Logout user (blacklist refresh token on backend), clear storage, redirect
      */
     logout: async () => {
       try {
+        // ✅ STOP AUTO-REFRESH TIMER HERE
+        TokenManager.stopTokenRefreshTimer();
+        console.log('[Auth] Token refresh timer stopped');
+
+
         const access = localStorage.getItem(ACCESS_KEY);
         const refresh = localStorage.getItem(REFRESH_KEY);
         if (refresh) {
@@ -99,6 +123,7 @@ const Auth = (() => {
       }
     },
 
+
     /**
      * Get current user info
      */
@@ -107,11 +132,13 @@ const Auth = (() => {
       return user ? JSON.parse(user) : null;
     },
 
+
     /**
      * Get JWT tokens
      */
     getAccessToken: () => localStorage.getItem(ACCESS_KEY),
     getRefreshToken: () => localStorage.getItem(REFRESH_KEY),
+
 
     /**
      * Check authentication
@@ -119,6 +146,7 @@ const Auth = (() => {
     isAuthenticated: () => {
       return !!localStorage.getItem(ACCESS_KEY) && !!localStorage.getItem(USER_KEY);
     },
+
 
     /**
      * Role checks
@@ -128,10 +156,12 @@ const Auth = (() => {
       return user && user.role === requiredRole;
     },
 
+
     hasAnyRole: (roles) => {
       const user = Auth.getCurrentUser();
       return user && roles.includes(user.role);
     },
+
 
     /**
      * Require specific role pages
@@ -143,6 +173,7 @@ const Auth = (() => {
         return false;
       }
 
+
       const user = Auth.getCurrentUser();
       if (user.role !== requiredRole) {
         console.error(`[Auth] User ${user.username} (${user.role}) tried to access ${requiredRole} page`);
@@ -151,8 +182,10 @@ const Auth = (() => {
         return false;
       }
 
+
       return true;
     },
+
 
     requireAnyRole: (roles) => {
       if (!Auth.isAuthenticated()) {
@@ -160,6 +193,7 @@ const Auth = (() => {
         window.location.href = 'index.html';
         return false;
       }
+
 
       const user = Auth.getCurrentUser();
       if (!roles.includes(user.role)) {
@@ -169,10 +203,12 @@ const Auth = (() => {
         return false;
       }
 
+
       return true;
     },
   };
 })();
+
 
 // Export for modules
 if (typeof module !== 'undefined' && module.exports) {
