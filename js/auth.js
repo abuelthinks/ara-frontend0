@@ -1,4 +1,16 @@
-import { startTokenRefreshTimer, stopTokenRefreshTimer } from './tokenManager.js'
+import { startTokenRefreshTimer, stopTokenRefreshTimer } from './tokenManager.js';
+
+// --- Dynamic BASE_URL ---
+function getBaseURL() {
+  const repoName = 'ara-frontend0';
+  const pathname = window.location.pathname;
+  if (pathname.includes(`/${repoName}`)) {
+    return `/${repoName}`;
+  } else {
+    return '';
+  }
+}
+const BASE_URL = getBaseURL();
 
 // Key names for localStorage
 const ACCESS_KEY = 'ara_jwt_access';
@@ -8,7 +20,6 @@ const USER_KEY = 'ara_current_user';
 const login = async (username, password) => {
   try {
     console.log('[Auth] Attempting login with username:', username);
-
     const url = `${CONFIG.API_BASE_URL}/auth/login/`;
     console.log('[Auth] Login URL:', url);
 
@@ -60,8 +71,8 @@ const redirectToDashboard = (role) => {
     'ADMIN': 'pages/admin.html',
   };
   const redirectUrl = redirectMap[role] || 'pages/parent.html';
-  console.log(`[Auth] Redirecting ${role} to ${redirectUrl}`);
-  window.location.href = redirectUrl;
+  console.log(`[Auth] Redirecting ${role} to ${BASE_URL}/${redirectUrl}`);
+  window.location.href = `${BASE_URL}/${redirectUrl}`;
 };
 
 const logout = async () => {
@@ -88,7 +99,7 @@ const logout = async () => {
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
-    window.location.href = '/';
+    window.location.href = `${BASE_URL}/`;
   }
 };
 
@@ -116,14 +127,14 @@ const hasAnyRole = (roles) => {
 const requireRole = (requiredRole) => {
   if (!isAuthenticated()) {
     console.warn('[Auth] Not authenticated, redirecting to login');
-    window.location.href = '/';
+    window.location.href = `${BASE_URL}/`;
     return false;
   }
   const user = getCurrentUser();
   if (user.role !== requiredRole) {
     console.error(`[Auth] User ${user.username} (${user.role}) tried to access ${requiredRole} page`);
     alert(`Access denied. This page is for ${requiredRole}s only.`);
-    window.location.href = '/'; 
+    window.location.href = `${BASE_URL}/`;
     return false;
   }
   return true;
@@ -132,20 +143,19 @@ const requireRole = (requiredRole) => {
 const requireAnyRole = (roles) => {
   if (!isAuthenticated()) {
     console.warn('[Auth] Not authenticated, redirecting to login');
-    window.location.href = '/';
+    window.location.href = `${BASE_URL}/`;
     return false;
   }
   const user = getCurrentUser();
   if (!roles.includes(user.role)) {
     console.error(`[Auth] User ${user.username} (${user.role}) tried to access restricted page`);
     alert(`Access denied. This page is for ${roles.join(', ')} only.`);
-    window.location.href = '/'; 
+    window.location.href = `${BASE_URL}/`;
     return false;
   }
   return true;
 };
 
-// Export everything you need for other modules/pages
 export {
   login,
   logout,
