@@ -88,7 +88,7 @@ const logout = async () => {
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
-    window.location.href = '/index.html';
+    window.location.href = '/';
   }
 };
 
@@ -116,14 +116,14 @@ const hasAnyRole = (roles) => {
 const requireRole = (requiredRole) => {
   if (!isAuthenticated()) {
     console.warn('[Auth] Not authenticated, redirecting to login');
-    window.location.href = 'index.html';
+    window.location.href = '/';
     return false;
   }
   const user = getCurrentUser();
   if (user.role !== requiredRole) {
     console.error(`[Auth] User ${user.username} (${user.role}) tried to access ${requiredRole} page`);
     alert(`Access denied. This page is for ${requiredRole}s only.`);
-    redirectToDashboard(user.role);
+    window.location.href = '/'; 
     return false;
   }
   return true;
@@ -132,14 +132,14 @@ const requireRole = (requiredRole) => {
 const requireAnyRole = (roles) => {
   if (!isAuthenticated()) {
     console.warn('[Auth] Not authenticated, redirecting to login');
-    window.location.href = 'index.html';
+    window.location.href = '/';
     return false;
   }
   const user = getCurrentUser();
   if (!roles.includes(user.role)) {
     console.error(`[Auth] User ${user.username} (${user.role}) tried to access restricted page`);
     alert(`Access denied. This page is for ${roles.join(', ')} only.`);
-    redirectToDashboard(user.role);
+    window.location.href = '/'; 
     return false;
   }
   return true;
